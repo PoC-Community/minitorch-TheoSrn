@@ -1,4 +1,3 @@
-
 # TODO : test the function later
 import numpy as np
 from typing import Callable, Any
@@ -8,7 +7,7 @@ from typing import Callable, Any
 class MyCrossBackward:
 
     def __init__(self, *args, backward_function : Callable[..., None], name : str) -> None:
-        
+
         self.__data = list(args)
         self.__bf = backward_function
         self.__name = name
@@ -17,7 +16,7 @@ class MyCrossBackward:
 
     def __str__(self) -> str:
         return self.__name
-    
+
     def __call__(self, x) -> Any:
         """
             This method is called when calling the model with the () operation.
@@ -27,9 +26,9 @@ class MyCrossBackward:
         """
 
         return self.run(x)
-    
+
     """ Public """
-    
+
     def run(self, base) -> None:
         """run the backward operation
 
@@ -50,7 +49,7 @@ class CorrectTensor:
                  crossOpBack : MyCrossBackward = None) -> None:
         # the __ prefix mark private attributes (it can't be recovered
         # outside of the class)
-        
+
         assert (isinstance(data, (list, np.ndarray, int))), "The given data is of an invalid type"
 
         # code the init here (take into account the different possible input types)
@@ -76,7 +75,7 @@ class CorrectTensor:
     @property
     def data(self):
         return self.__data
-    
+
     @property
     def strides(self):
         return self.__data.strides
@@ -92,11 +91,11 @@ class CorrectTensor:
 
     # as our tensor elements need to be accessible you need to make each
     # function that make you object a pylist
-    # hint: __getitem__, __setitem__ 
-    
+    # hint: __getitem__, __setitem__
+
     def __getitem__(self, x):
         return self.__data[x]
-    
+
     def __setitem__(self, x, v):
         self.__data[x] = v
 
@@ -162,7 +161,7 @@ class CorrectTensor:
         """
 
         # in theory: a backward that accumulate gradient just start with a base tensor of 1 (if is None)
-        
+
         # code here
         if (base == None):
             base = CorrectTensor([1])
@@ -184,7 +183,7 @@ def add_deriv_soluce(base, *tensors):
         if (left.backward_op == None):
             left.grad = left.grad and left.grad + grad or grad 
         left.backward(grad)
-    
+
     if (right.requires_grad):
         grad = CorrectTensor(base.data * np.ones_like(left.data))
         if (right.backward_op == None):
@@ -201,7 +200,7 @@ def mul_deriv_soluce(base, *tensors):
         if (left.backward_op == None):
             left.grad = left.grad and left.grad + grad or grad
         left.backward(grad)
-    
+
     if right.requires_grad:
         grad = CorrectTensor(left.data.T * base.data)
         if (right.backward_op == None):
@@ -210,7 +209,7 @@ def mul_deriv_soluce(base, *tensors):
 
 def div_deriv_soluce(base, *tensors):
     """ tensors of the same shape """
-    
+
     unpacked_tensors : list[CorrectTensor] = list(tensors)
 
     zis_tensor : bool = isinstance(unpacked_tensors[0], CorrectTensor)
@@ -239,7 +238,7 @@ def pow_deriv_soluce(base, *args):
     tensor.backward(grad)
 
 def sub_deriv_soluce(base, *tensors):
-    
+
     unpacked_tensors : list[CorrectTensor] = list(tensors)
 
     if (unpacked_tensors[0].requires_grad):
@@ -356,7 +355,7 @@ class CorrectParameter:
     @property
     def name(self):
         return self.__name
-    
+
     @name.setter
     def name(self, x):
         self.__name = x
@@ -364,12 +363,12 @@ class CorrectParameter:
 class CorrectModule:
 
     def __init__(self) -> None:
-        
+
         self._parameters : list[CorrectParameter] = []
         self._sub_modules : list[CorrectModule] = []
 
     def __setattr__(self, __name: str, __value: Any) -> None:
-        
+
         if (isinstance(__value, CorrectParameter)):
             __value.name = __name
             self._parameters.append(__value)
